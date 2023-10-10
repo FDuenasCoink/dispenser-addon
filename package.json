@@ -1,6 +1,6 @@
 {
   "name": "@fduenascoink/dispenser-addon",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Addons to control oink dispenser in javascript",
   "repository": {
     "type": "git",
