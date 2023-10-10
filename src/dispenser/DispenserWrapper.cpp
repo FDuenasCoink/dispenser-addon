@@ -3,7 +3,6 @@
 std::thread nativeThreadDispenser;
 Napi::ThreadSafeFunction tsfnDispenser;
 static bool isRunningDispenser = true;
-static bool threadEndedDispenser = true;
 
 Napi::FunctionReference DispenserWrapper::constructor;
 
@@ -173,9 +172,8 @@ Napi::Value DispenserWrapper::OnDispense(const Napi::CallbackInfo &info)
       delete status;
     };
     isRunningDispenser = true;
-    threadEndedDispenser = false;
     while (isRunningDispenser) {
-      std::this_thread::sleep_for( std::chrono::milliseconds(10));
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
       Response_t response = this->dispenserControl_->CheckDevice();
       if (response.StatusCode == 301) continue;
       Response_t *value = new Response_t(response);
@@ -184,14 +182,12 @@ Napi::Value DispenserWrapper::OnDispense(const Napi::CallbackInfo &info)
       isRunningDispenser = false;
       break;
     }
-    threadEndedDispenser = true;
     tsfnDispenser.Release();
   });
 
   auto finishFn = [] (const Napi::CallbackInfo& info) {
     isRunningDispenser = false;
-    while (!threadEndedDispenser);
-    std::this_thread::sleep_for( std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     return;
   };
 
